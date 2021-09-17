@@ -8,6 +8,9 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.9"
 state-signals = "^0.2.1"
+cowsay = "^4.0"
+elasticsearch = ">=7.0.0,<7.14.0"
+kubernetes = "^18.20.0"
 
 [tool.poetry.dev-dependencies]
 
