@@ -4,8 +4,8 @@
 import datetime
 import logging
 import platform
-from typing import Any, Dict
 import pprint
+from typing import Any, Dict
 
 import kubernetes.client
 import kubernetes.config
@@ -71,7 +71,9 @@ def run(redis_host: str, redis_port: int, index: str, es_url: str):
             metadata = get_metadata(kube_client)
             metadata["timestamp"] = datetime.datetime.utcnow()
             metadata["uuid"] = signal.metadata["uuid"]
-            logger.info("Got the following metadata: {}".format(pprint.pformat(metadata)))
+            logger.info(
+                "Got the following metadata: {}".format(pprint.pformat(metadata))
+            )
 
             logger.info("Publishing metadata...")
             es_client = export.publish_result(

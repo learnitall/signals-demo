@@ -23,7 +23,11 @@ def breakpoint(name: str, responder: state_signals.SignalResponder):
     logger.info("Waiting for continue signal for name '{}'".format(name))
 
     for signal in responder.listen():
-        if signal.event == "continue" and signal.metadata is not None and signal.metadata["name"] == name:
+        if (
+            signal.event == "continue"
+            and signal.metadata is not None
+            and signal.metadata["name"] == name
+        ):
             responder.srespond(signal, ras=1)
             logger.info("Got continue signal")
             return
@@ -52,7 +56,9 @@ def main():
         if user_input.startswith("pbench"):
             pbench_exporter.publish_signal("upload", tag="for pbench")
         else:
-            exporter.publish_signal("continue", tag="break", metadata={"name": user_input})
+            exporter.publish_signal(
+                "continue", tag="break", metadata={"name": user_input}
+            )
 
 
 if __name__ == "__main__":

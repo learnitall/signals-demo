@@ -6,7 +6,7 @@ import logging
 
 import cowsay
 
-from signals_demo import loginit, util, breakpoint
+from signals_demo import breakpoint, loginit, util
 from signals_demo.benchmark import benchmark
 
 

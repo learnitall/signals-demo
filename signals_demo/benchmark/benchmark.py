@@ -6,7 +6,7 @@ import dataclasses
 import datetime
 import logging
 import uuid
-from typing import Tuple, Iterator
+from typing import Iterator, Tuple
 
 import state_signals
 
@@ -57,14 +57,24 @@ class Benchmark(abc.ABC):
         )
         exporter.logger = self.logger
         exporter.initialize(
-            legal_events=["benchmark_start", "benchmark_stop", "sample_stop", "sample_start", "upload"], 
-            tag="for pbench")  # tag that the pbench image uses, we'll adopt it here
+            legal_events=[
+                "benchmark_start",
+                "benchmark_stop",
+                "sample_stop",
+                "sample_start",
+                "upload",
+            ],
+            tag="for pbench",
+        )  # tag that the pbench image uses, we'll adopt it here
 
         self.logger.info("Getting metric")
 
         # Signal that we are starting the benchmark
         exporter.publish_signal(
-            "benchmark_start", tag="for pbench", timeout=10, metadata={"uuid": self.uuid}
+            "benchmark_start",
+            tag="for pbench",
+            timeout=10,
+            metadata={"uuid": self.uuid},
         )
 
         for sample in range(1, 4):
@@ -97,10 +107,11 @@ class Benchmark(abc.ABC):
                 duration=duration,
                 metric_name=metric_name,
                 metric_value=metric_value,
-                sample=sample
+                sample=sample,
             )
 
         exporter.publish_signal("benchmark_stop", tag="for pbench", timeout=20)
+
 
 def publish_result(result: BenchmarkResult, index: str, es_url: str):
     """Pubilsh the given benchmark result to ES."""
