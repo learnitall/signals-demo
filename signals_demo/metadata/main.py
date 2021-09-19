@@ -48,7 +48,7 @@ def run(redis_host: str, redis_port: int, index: str, es_url: str):
         redis_host, redis_port, responder_name="metadata"
     )
     responder.logger = logger
-    responder.lock_tag("demo")
+    responder.lock_tag("for pbench")
 
     logger.info("Creating kubernetes client")
     kubernetes.config.load_kube_config()
@@ -61,7 +61,7 @@ def run(redis_host: str, redis_port: int, index: str, es_url: str):
             "Got '{}' event from '{}'".format(signal.event, signal.process_name)
         )
 
-        if signal.event == "start":
+        if signal.event == "benchmark_start":
             if signal.metadata is None:
                 logger.warning("Expected uuid in metadata, instead got None. Ignoring")
                 continue

@@ -29,8 +29,8 @@ def run(redis_host: str, redis_port: int, index: str, es_url: str):
     """Run the cowsay benchmark and publish results."""
 
     cowsay_bench = CowSay(redis_host, redis_port)
-    result = cowsay_bench.run()
-    benchmark.publish_result(result, index, es_url)
+    for result in cowsay_bench.run():
+        benchmark.publish_result(result, index, es_url)
 
 
 def main():

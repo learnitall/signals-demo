@@ -28,7 +28,7 @@ and open `main.ipynb`. This walks though the commands to run the demo. The secon
 
 ```
 | Terminal 1 | Terminal 2 |
-|        Terminal 3       |
+| Terminal 3 | Terminal 4 |
 ```
 
 Flow is as follows:

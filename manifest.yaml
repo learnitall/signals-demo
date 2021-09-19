@@ -59,6 +59,15 @@ spec:
         volumeMounts:
           - name: demo-source
             mountPath: /opt/demo
+      - name: pbench
+        image: quay.io/meyceoz/signal-pbench
+        command: ["/bin/sh", "-c"]
+        args:
+          - /opt/demo/script/pbench.sh
+        volumeMounts:
+          - name: demo-source
+            mountPath: /opt/demo
+
       volumes:
       - name: demo-source
         hostPath:

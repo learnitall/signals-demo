@@ -6,7 +6,7 @@ import dataclasses
 import datetime
 import logging
 import uuid
-from typing import Tuple
+from typing import Tuple, Iterator
 
 import state_signals
 
@@ -26,6 +26,7 @@ class BenchmarkResult:
     duration: float
     metric_name: str
     metric_value: float
+    sample: int
 
 
 class Benchmark(abc.ABC):
@@ -43,7 +44,7 @@ class Benchmark(abc.ABC):
     def get_metric(self) -> Tuple[str, float]:
         """Run a benchmark and get the resulting metric."""
 
-    def run(self) -> BenchmarkResult:
+    def run(self) -> Iterator[BenchmarkResult]:
         """Run the benchmark and return a result."""
 
         self.logger.info("Preparting to run benchmark '{}'".format(self.name))
@@ -55,40 +56,51 @@ class Benchmark(abc.ABC):
             redis_port=self.redis_port,
         )
         exporter.logger = self.logger
-        exporter.initialize(legal_events=["start", "end"], tag="demo")
+        exporter.initialize(
+            legal_events=["benchmark_start", "benchmark_stop", "sample_stop", "sample_start", "upload"], 
+            tag="for pbench")  # tag that the pbench image uses, we'll adopt it here
 
         self.logger.info("Getting metric")
 
         # Signal that we are starting the benchmark
         exporter.publish_signal(
-            "start", tag="demo", timeout=10, metadata={"uuid": self.uuid}
+            "benchmark_start", tag="for pbench", timeout=10, metadata={"uuid": self.uuid}
         )
 
-        self.logger.info("Running...")
-
-        start_time = datetime.datetime.utcnow()
-        metric_name, metric_value = self.get_metric()
-        end_time = datetime.datetime.utcnow()
-        duration = (end_time - start_time).total_seconds()
-
-        self.logger.info(
-            "Got the following metric in {} seconds: '{}={}'".format(
-                duration, metric_name, metric_value
+        for sample in range(1, 4):
+            exporter.publish_signal(
+                "sample_start", tag="for pbench", timeout=10, sample=sample
             )
-        )
 
-        exporter.publish_signal("end", tag="demo", timeout=20)
+            self.logger.info("Running sample {}...".format(sample))
 
-        return BenchmarkResult(
-            uuid=self.uuid,
-            name=self.name,
-            start_time=start_time,
-            end_time=end_time,
-            duration=duration,
-            metric_name=metric_name,
-            metric_value=metric_value,
-        )
+            start_time = datetime.datetime.utcnow()
+            metric_name, metric_value = self.get_metric()
+            end_time = datetime.datetime.utcnow()
+            duration = (end_time - start_time).total_seconds()
 
+            exporter.publish_signal(
+                "sample_stop", tag="for pbench", timeout=10, sample=sample
+            )
+
+            self.logger.info(
+                "Got the following metric in {} seconds: '{}={}'".format(
+                    duration, metric_name, metric_value
+                )
+            )
+
+            yield BenchmarkResult(
+                uuid=self.uuid,
+                name=self.name,
+                start_time=start_time,
+                end_time=end_time,
+                duration=duration,
+                metric_name=metric_name,
+                metric_value=metric_value,
+                sample=sample
+            )
+
+        exporter.publish_signal("benchmark_stop", tag="for pbench", timeout=20)
 
 def publish_result(result: BenchmarkResult, index: str, es_url: str):
     """Pubilsh the given benchmark result to ES."""
