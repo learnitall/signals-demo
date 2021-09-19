@@ -34,7 +34,8 @@ and open `main.ipynb`. This walks though the commands to run the demo. The secon
 Flow is as follows:
 
 1. Open the terminals and run the appropriate command for each
-1. When everything is ready to go, continue the metadata process (type `metadata` in Terminal 3)
-1. Then continue the benchmark (type `benchmark` in Terminal 3)
+1. When everything is ready to go, continue the metadata process (type `metadata` in Terminal 1)
+1. Then continue the benchmark (type `benchmark` in Terminal 1)
 1. Walk through the logs showing execution flow
+1. Type `pbench` in Terminal 1 to show the files pbench agent collected
 1. Run the last cell to show results in ES
