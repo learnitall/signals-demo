@@ -37,5 +37,4 @@ Flow is as follows:
 1. When everything is ready to go, continue the metadata process (type `metadata` in Terminal 3)
 1. Then continue the benchmark (type `benchmark` in Terminal 3)
 1. Walk through the logs showing execution flow
-1. Run the last cell in the notebook and open `http://localhost:5601`
-1. Create the new index within Kibana and go over the results
+1. Run the last cell to show results in ES

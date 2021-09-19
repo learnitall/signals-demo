@@ -31,13 +31,6 @@ spec:
             value: -Xms512m -Xmx512m
         ports:
           - containerPort: 9200
-      - name: kibana
-        image: docker.elastic.co/kibana/kibana:7.14.1
-        env:
-          - name: ELASTICSEARCH_HOSTS
-            value: http://localhost:9200
-        ports:
-          - containerPort: 5601
       - name: benchmark
         image: python:3.9
         env:  # https://stackoverflow.com/questions/43969743/logs-in-kubernetes-pod-not-showing-up
