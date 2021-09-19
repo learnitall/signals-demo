@@ -61,6 +61,7 @@ def run(redis_host: str, redis_port: int, index: str, es_url: str):
             logger.info("Getting metadata...")
             metadata = get_metadata(kube_client)
             metadata["timestamp"] = datetime.datetime.now()
+            metadata["uuid"] = signal.metadata["uuid"]
 
             logger.info("Publishing metadata...")
             _es_client = export.publish_result(
