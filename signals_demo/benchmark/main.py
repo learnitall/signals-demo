@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Main entrypoint for running a benchmark demo."""
-import argparse
 import datetime
+import logging
 
 import cowsay
 
-from . import benchmark
+from signals_demo import loginit, util, breakpoint
+from signals_demo.benchmark import benchmark
 
 
 class CowSay(benchmark.Benchmark):
@@ -16,9 +17,10 @@ class CowSay(benchmark.Benchmark):
 
     def get_metric(self):
         count = 0
-        start = datetime.datetime.now()
-        while (datetime.datetime.now() - start).total_seconds() < 5:
+        start = datetime.datetime.utcnow()
+        while (datetime.datetime.utcnow() - start).total_seconds() < 5:
             cowsay.cow("I'm on count {}".format(count))
+            count += 1
 
         return "cowsay_count", count
 
@@ -34,15 +36,16 @@ def run(redis_host: str, redis_port: int, index: str, es_url: str):
 def main():
     """Parse args from the CLI then run"""
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--redis-host")
-    parser.add_argument("--redis-port")
-    parser.add_argument("--es-index")
-    parser.add_argument("--es-url")
+    args = util.get_args()
+    logger = logging.getLogger().getChild("benchmark")
+    util.wait_for_redis(args.redis_host, args.redis_port, logger)
+    util.wait_for_es(args.es_url, logger)
+    responder = breakpoint.init_responder(args.redis_host, args.redis_port)
 
-    args = parser.parse_args()
-
-    run(args.redis_host, args.redis_port, args.es_index, args.es_url)
+    logger.info("Starting")
+    while True:
+        breakpoint.breakpoint("benchmark", responder)
+        run(args.redis_host, args.redis_port, args.es_index, args.es_url)
 
 
 if __name__ == "__main__":

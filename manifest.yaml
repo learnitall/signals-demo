@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signals-demo
+  labels:
+    app: signals-demo
+spec:
+  selector:
+    matchLabels:
+      app: signals-demo
+  template:
+    metadata:
+      labels:
+        app: signals-demo
+    spec:
+      containers:
+      - name: redis
+        image: redis
+        ports:
+        - containerPort: 6379
+      - name: elastic
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+        env:
+          - name: discovery.type
+            value: single-node
+          - name: node.name
+            value: es01
+          - name: bootstrap.memory_lock
+            value: "true"
+          - name: ES_JAVA_OPTS
+            value: -Xms512m -Xmx512m
+        ports:
+          - containerPort: 9200
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:7.14.1
+        env:
+          - name: ELASTICSEARCH_HOSTS
+            value: http://localhost:9200
+        ports:
+          - containerPort: 5601
+      - name: benchmark
+        image: python:3.9
+        env:  # https://stackoverflow.com/questions/43969743/logs-in-kubernetes-pod-not-showing-up
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        tty: true
+        stdin: true
+        workingDir: /opt/demo
+        command: ["/bin/sh", "-c"]
+        args:
+          - script/benchmark.sh
+        volumeMounts:
+          - name: demo-source
+            mountPath: /opt/demo
+      - name: breakpoint
+        image: python:3.9
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        tty: true
+        stdin: true
+        workingDir: /opt/demo
+        command: ["/bin/sh", "-c"]
+        args:
+          - script/breakpoint.sh
+        volumeMounts:
+          - name: demo-source
+            mountPath: /opt/demo
+      volumes:
+      - name: demo-source
+        hostPath:
+          path: /home/docker/demo
+        

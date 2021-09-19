@@ -10,7 +10,7 @@ from typing import Tuple
 
 import state_signals
 
-from .. import export
+from signals_demo import breakpoint, export, loginit
 
 _client = None
 
@@ -46,7 +46,7 @@ class Benchmark(abc.ABC):
     def run(self) -> BenchmarkResult:
         """Run the benchmark and return a result."""
 
-        self.logger.info("Preparting to run benchmark '{}'", self.name)
+        self.logger.info("Preparting to run benchmark '{}'".format(self.name))
 
         self.logger.info("Creating signal exporter")
         exporter = state_signals.SignalExporter(
@@ -66,14 +66,14 @@ class Benchmark(abc.ABC):
 
         self.logger.info("Running...")
 
-        start_time = datetime.datetime.now()
+        start_time = datetime.datetime.utcnow()
         metric_name, metric_value = self.get_metric()
-        end_time = datetime.datetime.now()
+        end_time = datetime.datetime.utcnow()
         duration = (end_time - start_time).total_seconds()
 
         self.logger.info(
             "Got the following metric in {} seconds: '{}={}'".format(
-                metric_name, metric_value
+                duration, metric_name, metric_value
             )
         )
 
@@ -94,7 +94,7 @@ def publish_result(result: BenchmarkResult, index: str, es_url: str):
     """Pubilsh the given benchmark result to ES."""
 
     result_body = dataclasses.asdict(result)
-    result_body["timestamp"] = datetime.datetime.now()
+    result_body["timestamp"] = datetime.datetime.utcnow()
     global _client
     _client = export.publish_result(
         result_body, index=index, client=_client, es_url=es_url

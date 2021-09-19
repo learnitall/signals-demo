@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "signals-demo"
+name = "signals_demo"
 version = "0.1.0"
 description = "Demo of using the state-signals package within a benchmark"
 authors = ["Ryan Drew <learnitall0@gmail.com>"]
@@ -11,8 +11,10 @@ state-signals = "^0.2.1"
 cowsay = "^4.0"
 elasticsearch = ">=7.0.0,<7.14.0"
 kubernetes = "^18.20.0"
+jupyterlab = {version = "^3.1.12", optional = true}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.extras]
+demo = ["jupyterlab"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
