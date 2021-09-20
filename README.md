@@ -4,6 +4,8 @@ Demo of the [state-signals](https://github.com/distributed-system-analysis/state
 
 Written by Ryan Drew, 2021
 
+![Architecture Diagram](assets/arch.png)
+
 ## Installing
 
 Requires [minikube](https://minikube.sigs.k8s.io/docs/) cluster running within KVM on a RHEL-based host. Tested on Fedora 34 with minikube v1.23.0 and Python 3.9.6.
